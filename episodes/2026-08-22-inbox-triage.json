@@ -1,0 +1,19 @@
+{
+  "id": "2026-08-22-inbox-triage",
+  "source": "~/inbox/HHZFeu1WQAA66EA.jpg (screenshot)",
+  "date": "2026-08-22",
+  "entities": [
+    { "name": "inbox item HHZFeu1WQAA66EA", "type": "ARTIFACT", "aliases": ["hhzfeu1wqaa66ea.jpg"], "description": "Inbox screenshot of a Google search bar" },
+    { "name": "demand validation search", "type": "CONCEPT", "description": "Search-engine mining of complaint phrasing to find unmet product demand" },
+    { "name": "site-scoped reddit query", "type": "CONCEPT", "description": "Google query pattern site:reddit \"is there an app that\"" },
+    { "name": "unmet app demand", "type": "CONCEPT", "description": "User requests for apps that do not yet exist" },
+    { "name": "global search scope rule", "type": "CONCEPT", "description": "Standing instruction: research searches must be web-global, not limited to reddit" }
+  ],
+  "relations": [
+    { "subject": "inbox item HHZFeu1WQAA66EA", "predicate": "depicts", "object": "demand validation search" },
+    { "subject": "demand validation search", "predicate": "exemplified-by", "object": "site-scoped reddit query" },
+    { "subject": "site-scoped reddit query", "predicate": "surfaces", "object": "unmet app demand" },
+    { "subject": "unmet app demand", "predicate": "feeds", "object": "solo-dev opportunity validation" },
+    { "subject": "demand validation search", "predicate": "constrained-by", "object": "global search scope rule" }
+  ]
+}
