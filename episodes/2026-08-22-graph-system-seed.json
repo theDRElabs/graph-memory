@@ -1,0 +1,43 @@
+{
+  "id": "2026-08-22-graph-system-seed",
+  "source": "~/.config/opencode/memory.md + session decisions",
+  "date": "2026-08-22",
+  "entities": [
+    { "name": "opencode", "type": "TOOL", "description": "CLI coding agent this environment runs on" },
+    { "name": "graph system", "type": "CONCEPT", "description": "JSONL triple store with provenance and temporal validity powering agent memory" },
+    { "name": "graph-memory repo", "type": "REPO", "aliases": ["graph repo", "graph-memory"], "description": "Private GitHub repo storing the knowledge graph" },
+    { "name": "anthropics/claude-cookbooks", "type": "REPO", "aliases": ["claude cookbooks", "anthropic cookbook"], "description": "Source of the Extract-Resolve-Assemble-Query construction pipeline" },
+    { "name": "Zep Graphiti", "type": "CONCEPT", "aliases": ["graphiti", "zep"], "description": "Bi-temporal fact semantics source: invalidate, never delete" },
+    { "name": "AGENTS.md", "type": "ARTIFACT", "aliases": ["global agents md"], "description": "Frozen global rules: topology discipline, verifier protocol, escalation limits, quarantine" },
+    { "name": "Termux environment", "type": "TOOL", "aliases": ["termux", "the phone", "android terminal"], "description": "Android terminal hosting the entire dev setup" },
+    { "name": "GitHub Actions", "type": "TOOL", "aliases": ["gh actions"], "description": "Offload target for heavy jobs the phone cannot run" },
+    { "name": "theDRElabs", "type": "ORG" },
+    { "name": "noreply git email", "type": "CONCEPT", "description": "144799227+theDRElabs@users.noreply.github.com - required for pushes" },
+    { "name": "GH007 rejection", "type": "EVENT", "aliases": ["gh007"], "description": "GitHub push rejection caused by personal email" },
+    { "name": "Vercel personal access token", "type": "TOOL", "aliases": ["vercel pat", "vercel account token"], "description": "Full-account token from vercel.com/account/settings/tokens; CLI login tokens expire and are useless as secrets" },
+    { "name": "VERCEL_TOKEN secret", "type": "CONCEPT", "description": "GitHub secret consumed by deploy workflows" },
+    { "name": "heavy local builds", "type": "CONCEPT", "aliases": ["heavy builds"], "description": "Builds too large for on-device execution" },
+    { "name": "NODE_OPTIONS memory cap", "type": "CONCEPT", "aliases": ["max-old-space-size 1536"], "description": "--max-old-space-size=1536 required for on-device node builds" },
+    { "name": "solo-dev opportunity validation", "type": "EVENT", "description": "Ongoing thread validating demand for ranked solo-dev bets" },
+    { "name": "disable all AI switch", "type": "CONCEPT", "description": "Top-scored product idea from the opportunity ranking" },
+    { "name": "CyrilXBT", "type": "PERSON", "description": "Author of the graph-architect course article that seeded this project" }
+  ],
+  "relations": [
+    { "subject": "graph system", "predicate": "stored-in", "object": "graph-memory repo" },
+    { "subject": "graph system", "predicate": "extends", "object": "opencode" },
+    { "subject": "graph system", "predicate": "pipeline-aligned-with", "object": "anthropics/claude-cookbooks" },
+    { "subject": "graph system", "predicate": "temporal-semantics-from", "object": "Zep Graphiti" },
+    { "subject": "graph system", "predicate": "runs-on", "object": "Termux environment" },
+    { "subject": "graph system", "predicate": "offloads-to", "object": "GitHub Actions" },
+    { "subject": "graph system", "predicate": "rules-encoded-in", "object": "AGENTS.md" },
+    { "subject": "graph system", "predicate": "inspired-by", "object": "CyrilXBT" },
+    { "subject": "AGENTS.md", "predicate": "mandates", "object": "noreply git email" },
+    { "subject": "noreply git email", "predicate": "prevents", "object": "GH007 rejection" },
+    { "subject": "VERCEL_TOKEN secret", "predicate": "must-come-from", "object": "Vercel personal access token" },
+    { "subject": "NODE_OPTIONS memory cap", "predicate": "enables", "object": "heavy local builds" },
+    { "subject": "heavy local builds", "predicate": "prefer-offloading-to", "object": "GitHub Actions" },
+    { "subject": "graph-memory repo", "predicate": "published-under", "object": "theDRElabs" },
+    { "subject": "solo-dev opportunity validation", "predicate": "top-ranked", "object": "disable all AI switch" },
+    { "subject": "solo-dev opportunity validation", "predicate": "deferred-for", "object": "graph system" }
+  ]
+}

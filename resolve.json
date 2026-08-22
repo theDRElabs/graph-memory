@@ -1,1 +1,26 @@
-{"clusters": []}
+{
+  "clusters": [
+    {
+      "canonical": "Termux environment",
+      "type": "TOOL",
+      "aliases": ["termux", "the phone", "android terminal"],
+      "description": "Android terminal hosting the entire dev setup"
+    },
+    {
+      "canonical": "Vercel personal access token",
+      "type": "TOOL",
+      "aliases": ["vercel pat", "vercel login token", "vercel cli login token"],
+      "description": "Full-account token from vercel.com/account/settings/tokens"
+    },
+    {
+      "canonical": "graph-memory repo",
+      "type": "REPO",
+      "aliases": ["graph repo", "thedrelabs/graph-memory"]
+    },
+    {
+      "canonical": "GitHub Actions",
+      "type": "TOOL",
+      "aliases": ["gh actions", "actions runners"]
+    }
+  ]
+}
