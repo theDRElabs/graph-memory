@@ -24,6 +24,17 @@ for (const c of resolveData.clusters ?? []) {
   if ((c.aliases?.length ?? 0) > 4)
     logError(`OVER-MERGE-RISK cluster "${c.canonical}" has ${c.aliases.length} aliases - review manually`);
 }
+const aliasOwner = new Map();
+for (const c of resolveData.clusters ?? []) {
+  for (const nm of [c.canonical.toLowerCase(), ...(c.aliases ?? []).map((a) => a.toLowerCase())]) {
+    const owner = aliasOwner.get(nm);
+    if (owner && owner !== c.canonical)
+      logError(
+        `ALIAS-COLLISION "${nm}" claimed by clusters "${owner}" and "${c.canonical}" - false-merge risk, fix resolve.json`
+      );
+    else aliasOwner.set(nm, c.canonical);
+  }
+}
 const aliasToCanonical = new Map();
 for (const c of resolveData.clusters ?? []) {
   aliasToCanonical.set(c.canonical.toLowerCase(), c.canonical);
@@ -33,6 +44,7 @@ for (const c of resolveData.clusters ?? []) {
 const clusterByName = new Map();
 for (const c of resolveData.clusters ?? []) clusterByName.set(c.canonical.toLowerCase(), c);
 
+let rejectedEpisodes = 0;
 const episodes = fs
   .readdirSync(DIR("episodes"))
   .filter((f) => f.endsWith(".json"))
@@ -40,6 +52,15 @@ const episodes = fs
   .map((f) => {
     const data = JSON.parse(fs.readFileSync(path.join(DIR("episodes"), f), "utf8"));
     return { file: f, ...data };
+  })
+  .filter((ep) => {
+    if (!ep.source || !String(ep.source).trim()) {
+      rejectedEpisodes++;
+      logError(`EPISODE-REJECTED ${ep.id ?? ep.file}: missing source - no receipt, no entry`);
+      process.exitCode = 1;
+      return false;
+    }
+    return true;
   });
 
 const declaredNames = new Set();
@@ -161,9 +182,25 @@ for (const ep of episodes) {
   }
 }
 
+const invFile = DIR("invalidations.json");
+let appliedInvalidations = 0;
+if (fs.existsSync(invFile)) {
+  const inv = JSON.parse(fs.readFileSync(invFile, "utf8"));
+  for (const [key, v] of Object.entries(inv)) {
+    const e = edgeIndex.get(key);
+    if (!e) {
+      logError(`INVALIDATION-TARGET-MISSING "${key}"`);
+      continue;
+    }
+    e.invalid_at = v.invalid_at ?? null;
+    e.superseded_by = v.superseded_by ?? null;
+    appliedInvalidations++;
+  }
+}
+
 writeJSONL(DIR("nodes.jsonl"), nodes.sort((a, b) => a.id.localeCompare(b.id)));
 writeJSONL(DIR("edges.jsonl"), edges.sort((a, b) => a.subject.localeCompare(b.subject)));
 
 console.log(
-  `assemble ok | episodes: ${episodes.length} | nodes: ${nodes.length} (+${addedNodes}) | edges: ${edges.length} (+${addedEdges}, deduped ${mergedEdges}) | self-loops dropped: ${droppedSelfLoops} | fallback clusters: ${fallbacks}`
+  `assemble ok | episodes: ${episodes.length} (rejected ${rejectedEpisodes}) | nodes: ${nodes.length} (+${addedNodes}) | edges: ${edges.length} (+${addedEdges}, deduped ${mergedEdges}) | self-loops dropped: ${droppedSelfLoops} | dangling refs: ${fallbacks} | invalidations: ${appliedInvalidations}`
 );
