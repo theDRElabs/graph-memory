@@ -17,5 +17,6 @@
 {"subject":"site-scoped-reddit-query","predicate":"surfaces","object":"unmet-app-demand","episodes":["2026-08-22-inbox-triage"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}
 {"subject":"solo-dev-opportunity-validation","predicate":"top-ranked","object":"disable-all-ai-switch","episodes":["2026-08-22-graph-system-seed"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}
 {"subject":"solo-dev-opportunity-validation","predicate":"deferred-for","object":"graph-system","episodes":["2026-08-22-graph-system-seed"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}
+{"subject":"solo-dev-opportunity-validation","predicate":"research-governed-by","object":"global-search-scope-rule","episodes":["2026-08-22-search-scope-rule"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}
 {"subject":"unmet-app-demand","predicate":"feeds","object":"solo-dev-opportunity-validation","episodes":["2026-08-22-inbox-triage"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}
 {"subject":"vercel-token-secret","predicate":"must-come-from","object":"vercel-personal-access-token","episodes":["2026-08-22-graph-system-seed"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}

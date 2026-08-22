@@ -1,0 +1,12 @@
+{
+  "id": "2026-08-22-search-scope-rule",
+  "source": "~/.config/opencode/memory.md standing instruction",
+  "date": "2026-08-22",
+  "entities": [
+    { "name": "global search scope rule", "type": "CONCEPT", "description": "Standing user instruction: opportunity research searches must be web-global, not limited to reddit" },
+    { "name": "solo-dev opportunity validation", "type": "EVENT", "description": "Ongoing thread validating demand for ranked solo-dev product bets" }
+  ],
+  "relations": [
+    { "subject": "solo-dev opportunity validation", "predicate": "research-governed-by", "object": "global search scope rule" }
+  ]
+}
