@@ -1,0 +1,12 @@
+{
+  "id": "2026-08-23-ecc-hooks-incompatible",
+  "source": "session audit of /tmp/opencode/ECC hooks/hooks.json: PreToolUse dispatchers bootstrap node scripts via CLAUDE_PLUGIN_ROOT and hardwired ~/.claude plugin-cache path probing",
+  "date": "2026-08-23",
+  "entities": [
+    { "name": "ECC hooks layer", "type": "ARTIFACT", "description": "Claude Code-format PreToolUse hook JSON (bash dispatcher, doc-file warnings, suggest-compact, GateGuard) implemented as inline node -e bootstraps resolving an ECC plugin root under ~/.claude; never port to opencode — architecturally incompatible" },
+    { "name": "opencode", "type": "TOOL", "description": "The CLI coding agent this device runs; config at ~/.config/opencode/" }
+  ],
+  "relations": [
+    { "subject": "ECC hooks layer", "predicate": "runtime-incompatible-with", "object": "opencode" }
+  ]
+}

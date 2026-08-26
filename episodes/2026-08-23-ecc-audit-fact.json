@@ -1,0 +1,14 @@
+{
+  "id": "2026-08-23-ecc-audit-fact",
+  "source": "direct inspection of cloned affaan-m/ECC at /tmp/opencode/ECC (shallow clone, 3493 files), 2026-08-23",
+  "date": "2026-08-23",
+  "entities": [
+    { "name": "ECC repo", "type": "REPO", "description": "affaan-m/ECC 'Everything Claude Code' community pack for Claude Code; audited contents verified: 68 agents, 286 skills, 94 commands, 12 legacy command shims, plus Claude Code-specific rules/workflows/plugins/hooks; marketing counts match reality" },
+    { "name": "extracted ECC components", "type": "ARTIFACT", "description": "Installed into ~/.config/opencode/: subagents security-reviewer, silent-failure-hunter, pr-test-analyzer (agent/, mode:subagent, CC tools/model frontmatter stripped) and skills security-scan (hard-gated: .claude-dir audits only, needs npx ecc-agentshield), e2e-testing, error-handling, context-budget (skills/); everything else rejected as overlapping AGENTS.md protocol, graph-memory, existing Next.js/Vercel skills, or CI pipeline; domain packs (postgres/docker/k8s/migrations) deferred as need-triggered lazy picks from the still-cloned repo" },
+    { "name": "graph system", "type": "CONCEPT", "description": "Persistent knowledge graph + workflow this device uses instead of a framework's built-in memory/continuous-learning layer" }
+  ],
+  "relations": [
+    { "subject": "ECC repo", "predicate": "was-audited-as-extraction-source-for", "object": "extracted ECC components" },
+    { "subject": "graph system", "predicate": "supersedes-memory-features-of", "object": "ECC repo" }
+  ]
+}

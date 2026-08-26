@@ -1,0 +1,14 @@
+{
+  "id": "2026-08-23-ecc-extraction-decision",
+  "source": "session decision 2026-08-23 (user-approved shortlist); installed files on disk",
+  "date": "2026-08-23",
+  "entities": [
+    { "name": "extracted ECC components", "type": "ARTIFACT", "description": "Installed into ~/.config/opencode/: subagents security-reviewer, silent-failure-hunter, pr-test-analyzer (agent/, mode:subagent, CC tools/model frontmatter stripped) and skills security-scan (hard-gated: .claude-dir audits only, needs npx ecc-agentshield), e2e-testing, error-handling, context-budget (skills/); everything else rejected as overlapping AGENTS.md protocol, graph-memory, existing Next.js/Vercel skills, or CI pipeline; domain packs (postgres/docker/k8s/migrations) deferred as need-triggered lazy picks from the still-cloned repo" },
+    { "name": "ECC repo", "type": "REPO", "description": "affaan-m/ECC 'Everything Claude Code' community pack; verified contents: 68 agents, 286 skills, 94 commands, 12 legacy shims, Claude Code-format hooks/rules/workflows" },
+    { "name": "opencode", "type": "TOOL", "description": "The CLI coding agent this device runs; config at ~/.config/opencode/" }
+  ],
+  "relations": [
+    { "subject": "extracted ECC components", "predicate": "selectively-extracted-from", "object": "ECC repo" },
+    { "subject": "extracted ECC components", "predicate": "installed-into-global-config-of", "object": "opencode" }
+  ]
+}

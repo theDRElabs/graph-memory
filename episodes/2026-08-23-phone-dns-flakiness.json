@@ -1,0 +1,12 @@
+{
+  "id": "2026-08-23-phone-dns-flakiness",
+  "source": "session observation during git clone of affaan-m/ECC: intermittent 'Could not resolve host: github.com/codeload.github.com', curl 56 TLS alert, fetch-pack disconnects; identical command succeeded on later attempt",
+  "date": "2026-08-23",
+  "entities": [
+    { "name": "phone network DNS flakiness", "type": "CONCEPT", "description": "Intermittent DNS/TLS failures on this device's network break github.com and codeload.github.com resolves mid-command; retrying the same command succeeds, so retry before switching download strategy" },
+    { "name": "Termux environment", "type": "TOOL", "description": "Android terminal hosting the entire dev setup" }
+  ],
+  "relations": [
+    { "subject": "phone network DNS flakiness", "predicate": "intermittently-degrades-network-operations-in", "object": "Termux environment" }
+  ]
+}
