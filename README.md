@@ -1,73 +1,63 @@
-# Graph Memory System
+# Graph Memory
 
-Persistent knowledge graph for this opencode environment. Aligned with
-anthropics/claude-cookbooks `capabilities/knowledge_graph` pipeline and
-Zep/Graphiti temporal-fact semantics (facts invalidated, never deleted).
+A persistent knowledge graph for OpenCode. It remembers facts, decisions, and relationships across sessions so the AI doesn't start from scratch every time.
 
-## Files
+## What it does
 
-| File | Role | Mutated by |
-|---|---|---|
-| `episodes/*.json` | Ground truth. Raw Extract-stage output per source document. Append-only, never edited after write. | Extraction (LLM stage) |
-| `resolve.json` | Entity-resolution clusters: canonical name + aliases + type/description. | Resolution (LLM stage) |
-| `nodes.jsonl` | Derived projection: canonical entities. | `scripts/graph-assemble.mjs` only |
-| `edges.jsonl` | Derived projection: typed directed triples with provenance + validity window. | `scripts/graph-assemble.mjs` only |
-| `invalidations.json` | Manual overlay marking superseded facts (`invalid_at`, `superseded_by`). Survives rebuilds. | Human/agent curation |
-| `errors.log` | Compounding quality log: dangling refs, self-loop drops, type conflicts, over-merge risks. | Scripts + manual notes |
+Stores knowledge as **entities** (tools, repos, people, concepts) connected by **relations** (dependencies, conflicts, ownership). Facts are time-stamped — when something becomes false, it's marked invalid rather than deleted, so you can see what was believed and when.
 
-## Episode contract
+## What's in here
+
+| File | What it does |
+|------|-------------|
+| `episodes/` | Raw facts extracted from source documents — append-only, never edited |
+| `resolve.json` | Entity deduplication — maps aliases to canonical names |
+| `nodes.jsonl` | Derived list of all canonical entities (rebuilt from episodes) |
+| `edges.jsonl` | Derived list of all relationships with provenance and validity windows |
+| `errors.log` | Quality issues — dangling references, self-loops, type conflicts |
+| `scripts/` | Assembly and query tools |
+
+## Quick start
+
+```bash
+# Rebuild the graph from episodes
+node scripts/graph-assemble.mjs
+
+# Query: show facts related to "Vercel" within 2 hops
+node scripts/graph-query.mjs "Vercel" --hops=2
+
+# Include invalidated (historical) facts
+node scripts/graph-query.mjs "Vercel" --hops=2 --all
+```
+
+## Adding knowledge
+
+Create an episode JSON file in `episodes/`:
 
 ```json
 {
-  "id": "2026-08-22-build-lessons",
-  "source": "~/projects/termux-setup/BUILD-LESSONS.md",
-  "date": "2026-08-22",
+  "id": "2026-08-26-my-source",
+  "source": "~/projects/my-project/README.md",
+  "date": "2026-08-26",
   "entities": [
-    { "name": "Vercel personal access token", "type": "TOOL",
-      "description": "one-line description",
-      "aliases": ["vercel pat"] }
+    { "name": "My Tool", "type": "TOOL", "description": "does one thing well" }
   ],
   "relations": [
-    { "subject": "...", "predicate": "short-verb-phrase", "object": "...",
-      "valid_at": "optional override, defaults to episode date" }
+    { "subject": "My Tool", "predicate": "depends on", "object": "Node.js" }
   ]
 }
 ```
 
-Entity types: PERSON, ORG, TOOL, REPO, EVENT, CONCEPT, ARTIFACT, LOCATION.
+Then run `node scripts/graph-assemble.mjs` to rebuild.
 
-Discipline (cookbook guidelines):
-- Only entities central to the content; skip incidental mentions.
-- Every relation must connect two declared entities (relation-only names are
-  flagged as DANGLING-REF in errors.log).
-- Predicates are short verb phrases.
+## Entity types
 
-## Commands
+PERSON, ORG, TOOL, REPO, EVENT, CONCEPT, ARTIFACT, LOCATION
 
-```bash
-node scripts/graph-assemble.mjs                      # rebuild projections from episodes/
-node scripts/graph-query.mjs "seed name" --hops=2    # active facts only
-GRAPH_DIR=/tmp/other node scripts/...                # operate on alternate store
-# query flags: --all (include invalidated), --hops=N
-```
+## Temporal facts
 
-Query output format: `(subject) --[predicate]--> (object)` lines plus a type
-legend, ready to paste into context. Answers built on it should cite edges.
+Facts have `valid_at` and `invalid_at` dates. When something changes, add an entry to `invalidations.json` and rerun assemble. The old fact stays in the graph as historical — queries default to active facts only.
 
-## Guards (what errors.log entries mean)
+## Backed up
 
-- `DANGLING-REF` — relation endpoint never declared anywhere. Fix: declare the
-  entity or extend resolve.json. Exists because unresolved names otherwise
-  vanish silently (documented cookbook failure mode).
-- `SELF-LOOP ... dropped` — both endpoints resolved to one entity. Either an
-  extraction error or a genuine over-merge; review before re-adding.
-- `OVER-MERGE-RISK` — cluster with >4 aliases; check distinctness using
-  descriptions as disambiguation context.
-- `TYPE-CONFLICT` — same entity claimed as two types.
-
-## Temporal semantics
-
-Edges carry `valid_at`, `invalid_at`, `superseded_by`. Contradicted facts are
-never deleted: add an entry to `invalidations.json` keyed `"s|p|o"`, rerun
-assemble. Queries default to active facts; `--all` recovers history
-("what did we believe then").
+This graph has its own git repo. It's cloned into `~/.config/opencode/graph/` as part of the full OpenCode config backup.
