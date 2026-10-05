@@ -1,6 +1,5 @@
 {"subject":"agents-md","predicate":"mandates","object":"noreply-git-email","episodes":["2026-08-22-graph-system-seed"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}
 {"subject":"demand-validation-search","predicate":"exemplified-by","object":"site-scoped-reddit-query","episodes":["2026-08-22-inbox-triage"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}
-{"subject":"demand-validation-search","predicate":"constrained-by","object":"global-search-scope-rule","episodes":["2026-08-22-inbox-triage"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null}
 {"subject":"ecc-hooks-layer","predicate":"runtime-incompatible-with","object":"opencode","episodes":["2026-08-23-ecc-hooks-incompatible"],"valid_at":"2026-08-23","invalid_at":null,"superseded_by":null}
 {"subject":"ecc-repo","predicate":"was-audited-as-extraction-source-for","object":"extracted-ecc-components","episodes":["2026-08-23-ecc-audit-fact"],"valid_at":"2026-08-23","invalid_at":null,"superseded_by":null}
 {"subject":"extracted-ecc-components","predicate":"selectively-extracted-from","object":"ecc-repo","episodes":["2026-08-23-ecc-extraction-decision"],"valid_at":"2026-08-23","invalid_at":null,"superseded_by":null}

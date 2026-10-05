@@ -88,9 +88,12 @@ const canon = (name, epId) => {
   return String(name);
 };
 
-const nodes = readJSONL(DIR("nodes.jsonl"));
-const edges = readJSONL(DIR("edges.jsonl"));
-const nodeIndex = new Map(nodes.map((n) => [n.id, n]));
+// G9: rebuild derived artifacts deterministically from episodes + resolve.json +
+// invalidations.json on every run. Do NOT read existing nodes/edges as input,
+// so deleting/editing an episode no longer leaves stale nodes/edges behind.
+const nodes = [];
+const edges = [];
+const nodeIndex = new Map();
 const edgeKey = (s, p, o) => `${slug(s)}|${slug(p)}|${slug(o)}`;
 const edgeIndex = new Map(edges.map((e) => [edgeKey(e.subject, e.predicate, e.object), e]));
 
