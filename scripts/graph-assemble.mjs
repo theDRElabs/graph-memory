@@ -8,8 +8,22 @@ const ROOT = process.env.GRAPH_DIR
   : path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIR = (d) => path.join(ROOT, d);
 
-const writeJSONL = (f, arr) =>
-  fs.writeFileSync(f, arr.map((o) => JSON.stringify(o)).join("\n") + "\n");
+const writeJSONL = (f, arr) => {
+  // G5: atomic write via temp file + rename so a crash never leaves a half-written file.
+  const tmp = `${f}.tmp.${process.pid}`;
+  fs.writeFileSync(tmp, arr.map((o) => JSON.stringify(o)).join("\n") + "\n");
+  fs.renameSync(tmp, f);
+};
+
+// G5: single-writer lockfile around the whole assemble run.
+const LOCK = DIR(".assemble.lock");
+try {
+  fs.writeFileSync(LOCK, String(process.pid), { flag: "wx" });
+} catch {
+  console.error(`another assemble is running (lockfile ${LOCK} exists) — refusing to run`);
+  process.exit(1);
+}
+process.on("exit", () => fs.rmSync(LOCK, { force: true }));
 const logError = (msg) =>
   fs.appendFileSync(DIR("errors.log"), `${new Date().toISOString()} ${msg}\n`);
 
