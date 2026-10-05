@@ -151,6 +151,27 @@ const nodeIndex = new Map();
 const edgeKey = (s, p, o) => `${slug(s)}|${slug(p)}|${slug(o)}`;
 const edgeIndex = new Map(edges.map((e) => [edgeKey(e.subject, e.predicate, e.object), e]));
 
+// G7: track which supporting episodes carry an explicit valid_at, per node/edge.
+// An edge's contribution is explicit iff its relation declared rel.valid_at;
+// a node's contribution is explicit iff the source episode does (top-level
+// valid_at, or every one of its relations declares valid_at).
+const epById = new Map();
+for (const ep of episodes) epById.set(ep.id ?? ep.file.replace(/\.json$/, ""), ep);
+const epHasExplicitValidAt = (ep) => {
+  if (!ep) return false;
+  if (typeof ep.valid_at === "string" && ep.valid_at.trim()) return true;
+  const rels = Array.isArray(ep.relations) ? ep.relations : [];
+  return rels.length > 0 && rels.every((r) => typeof r?.valid_at === "string" && r.valid_at.trim());
+};
+const nodeSupport = new Map(); // nodeId -> { all: Set<epId>, explicit: Set<epId> }
+const edgeSupport = new Map(); // edgeKey -> { all: Set<epId>, explicit: Set<epId> }
+const trackSupport = (map, key, epId, explicit) => {
+  let s = map.get(key);
+  if (!s) map.set(key, (s = { all: new Set(), explicit: new Set() }));
+  s.all.add(epId);
+  if (explicit) s.explicit.add(epId);
+};
+
 const ensureNode = (canonicalName, epId, epDate, hint = {}) => {
   const id = slug(canonicalName);
   let node = nodeIndex.get(id);
@@ -172,6 +193,7 @@ const ensureNode = (canonicalName, epId, epDate, hint = {}) => {
     nodeIndex.set(id, node);
   }
   if (!node.episodes.includes(epId)) node.episodes.push(epId);
+  trackSupport(nodeSupport, id, epId, epHasExplicitValidAt(epById.get(epId)));
   for (const a of [canonicalName.toLowerCase(), ...(hint.aliases ?? []).map((x) => x.toLowerCase())]) {
     if (!node.aliases.includes(a)) node.aliases.push(a);
   }
@@ -221,6 +243,7 @@ for (const ep of episodes) {
     const existing = edgeIndex.get(key);
     if (existing) {
       if (!existing.episodes.includes(epId)) existing.episodes.push(epId);
+      trackSupport(edgeSupport, key, epId, typeof rel.valid_at === "string" && rel.valid_at.trim());
       mergedEdges++;
       continue;
     }
@@ -235,6 +258,7 @@ for (const ep of episodes) {
     };
     edges.push(edge);
     edgeIndex.set(key, edge);
+    trackSupport(edgeSupport, key, epId, typeof rel.valid_at === "string" && rel.valid_at.trim());
     addedEdges++;
   }
 }
@@ -262,9 +286,51 @@ if (fs.existsSync(invFile)) {
   }
 }
 
+// G7: deterministic per-node/per-edge confidence scoring.
+const clamp01 = (n) => Math.min(1, Math.max(0, n));
+const confidenceFor = (supportEpisodes, support) => {
+  let c = 0.5;
+  if (supportEpisodes.length >= 2) c += 0.2;
+  if (support && support.all.size > 0 && [...support.all].every((epId) => support.explicit.has(epId))) c += 0.2;
+  return Math.round(clamp01(c) * 100) / 100;
+};
+for (const node of nodes) node.confidence = confidenceFor(node.episodes, nodeSupport.get(node.id));
+for (const edge of edges)
+  edge.confidence = confidenceFor(edge.episodes, edgeSupport.get(edgeKey(edge.subject, edge.predicate, edge.object)));
+
+// G7: contradiction detection over currently-active edges. Today is UTC; an edge
+// is active iff valid_at <= today AND (invalid_at is null OR invalid_at > today).
+const TODAY = new Date().toISOString().slice(0, 10);
+const isActive = (e) =>
+  typeof e.valid_at === "string" &&
+  e.valid_at <= TODAY &&
+  (e.invalid_at == null || (typeof e.invalid_at === "string" && e.invalid_at > TODAY));
+const bySubjPred = new Map();
+for (const e of edges) {
+  const k = `${e.subject}|${e.predicate}`;
+  if (!bySubjPred.has(k)) bySubjPred.set(k, []);
+  bySubjPred.get(k).push(e);
+}
+let contradictions = 0;
+for (const group of bySubjPred.values()) {
+  const active = group.filter(isActive);
+  const objs = new Set(active.map((e) => e.object));
+  if (objs.size < 2) continue;
+  for (let i = 0; i < active.length; i++) {
+    for (let j = i + 1; j < active.length; j++) {
+      const a = active[i];
+      const b = active[j];
+      if (a.object === b.object) continue;
+      contradictions++;
+      const eps = [...new Set([...a.episodes, ...b.episodes])].sort().join(", ");
+      logError(`CONTRADICTION ${a.subject} --[${a.predicate}]--> ${a.object} vs ${b.object} (episodes: ${eps})`);
+    }
+  }
+}
+
 writeJSONL(DIR("nodes.jsonl"), nodes.sort((a, b) => a.id.localeCompare(b.id)));
 writeJSONL(DIR("edges.jsonl"), edges.sort((a, b) => a.subject.localeCompare(b.subject) || a.predicate.localeCompare(b.predicate) || a.object.localeCompare(b.object)));
 
 console.log(
-  `assemble ok | episodes: ${episodes.length} (rejected ${rejectedEpisodes}) | nodes: ${nodes.length} (+${addedNodes}) | edges: ${edges.length} (+${addedEdges}, deduped ${mergedEdges}) | self-loops dropped: ${droppedSelfLoops} | dangling refs: ${fallbacks} | invalidations: ${appliedInvalidations}`
+  `assemble ok | episodes: ${episodes.length} (rejected ${rejectedEpisodes}) | nodes: ${nodes.length} (+${addedNodes}) | edges: ${edges.length} (+${addedEdges}, deduped ${mergedEdges}) | self-loops dropped: ${droppedSelfLoops} | dangling refs: ${fallbacks} | invalidations: ${appliedInvalidations} | contradictions: ${contradictions}`
 );
