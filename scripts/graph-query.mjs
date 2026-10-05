@@ -17,12 +17,16 @@ const slug = (s) =>
 
 const args = process.argv.slice(2);
 if (args.includes("--help") || args.length === 0) {
-  console.log("usage: graph-query.mjs <seed> [--hops=N] [--all]");
+  console.log("usage: graph-query.mjs <seed> [--hops=N] [--all] [--as-of=YYYY-MM-DD]");
   process.exit(0);
 }
 const all = args.includes("--all");
 const hopsArg = args.find((a) => a.startsWith("--hops="));
 const hops = hopsArg ? Math.max(1, parseInt(hopsArg.split("=")[1], 10)) : 2;
+const asOfArg = args.find((a) => a.startsWith("--as-of="));
+const asOf = asOfArg
+  ? asOfArg.split("=")[1]
+  : new Date().toISOString().slice(0, 10);
 const seedRaw = args.filter((a) => !a.startsWith("--")).join(" ").trim();
 
 const nodes = readJSONL(DIR("nodes.jsonl"));
@@ -40,7 +44,9 @@ if (!seedId) {
   process.exit(1);
 }
 
-const active = (e) => all || !e.invalid_at;
+const active = (e) =>
+  all ||
+  ((!e.valid_at || e.valid_at <= asOf) && (!e.invalid_at || e.invalid_at > asOf));
 
 const frontier = new Set([seedId]);
 const visited = new Set([seedId]);
@@ -53,20 +59,16 @@ for (let h = 0; h < hops; h++) {
     const inS = frontier.has(e.subject);
     const inO = frontier.has(e.object);
     if (!inS && !inO) continue;
+    const notYetActive = e.valid_at && e.valid_at > asOf;
     lines.push(
-      `(${e.subject}) --[${e.predicate}]${e.superseded_by ? `[superseded->${e.superseded_by}]` : ""}--> (${e.object})`
+      `(${e.subject}) --[${e.predicate}]${e.superseded_by ? `[superseded->${e.superseded_by}]` : ""}--> (${e.object})${all && notYetActive ? " [inactive]" : ""}`
     );
     if (inS && !visited.has(e.object)) next.add(e.object);
     if (inO && !visited.has(e.subject)) next.add(e.subject);
   }
-  visited.clear();
-  visited.add(seedId);
-  for (const n of frontier) visited.add(n);
+  for (const n of next) visited.add(n);
   frontier.clear();
-  for (const n of next) {
-    frontier.add(n);
-    visited.add(n);
-  }
+  for (const n of next) frontier.add(n);
 }
 
 const seenLines = [...new Set(lines)].sort();
