@@ -8,18 +8,22 @@ const ROOT = process.env.GRAPH_DIR
   : path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIR = (d) => path.join(ROOT, d);
 
-const readJSONL = (f) =>
-  fs.existsSync(f)
-    ? fs.readFileSync(f, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l))
-    : [];
 const writeJSONL = (f, arr) =>
   fs.writeFileSync(f, arr.map((o) => JSON.stringify(o)).join("\n") + "\n");
 const logError = (msg) =>
   fs.appendFileSync(DIR("errors.log"), `${new Date().toISOString()} ${msg}\n`);
+
+// G13: errors.log reflects only the most recent run — start by truncating it.
+fs.writeFileSync(DIR("errors.log"), "");
 const slug = (s) =>
   String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
-const resolveData = JSON.parse(fs.readFileSync(DIR("resolve.json"), "utf8"));
+let resolveData = { clusters: [] };
+try {
+  resolveData = JSON.parse(fs.readFileSync(DIR("resolve.json"), "utf8"));
+} catch (err) {
+  logError(`RESOLVE-REJECTED resolve.json: ${err.message}`);
+}
 for (const c of resolveData.clusters ?? []) {
   if ((c.aliases?.length ?? 0) > 4)
     logError(`OVER-MERGE-RISK cluster "${c.canonical}" has ${c.aliases.length} aliases - review manually`);
@@ -50,15 +54,58 @@ const episodes = fs
   .filter((f) => f.endsWith(".json"))
   .sort()
   .map((f) => {
-    const data = JSON.parse(fs.readFileSync(path.join(DIR("episodes"), f), "utf8"));
-    return { file: f, ...data };
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(DIR("episodes"), f), "utf8"));
+      return { file: f, ...data };
+    } catch (err) {
+      rejectedEpisodes++;
+      logError(`EPISODE-REJECTED ${f}: ${err.message}`);
+      process.exitCode = 1;
+      return null;
+    }
   })
+  .filter(Boolean)
   .filter((ep) => {
     if (!ep.source || !String(ep.source).trim()) {
       rejectedEpisodes++;
       logError(`EPISODE-REJECTED ${ep.id ?? ep.file}: missing source - no receipt, no entry`);
       process.exitCode = 1;
       return false;
+    }
+    // G12/G16: shape validation
+    if (ep.entities !== undefined && !Array.isArray(ep.entities)) {
+      rejectedEpisodes++;
+      logError(`EPISODE-REJECTED ${ep.id ?? ep.file}: entities must be an array`);
+      process.exitCode = 1;
+      return false;
+    }
+    if (ep.relations !== undefined && !Array.isArray(ep.relations)) {
+      rejectedEpisodes++;
+      logError(`EPISODE-REJECTED ${ep.id ?? ep.file}: relations must be an array`);
+      process.exitCode = 1;
+      return false;
+    }
+    if (!ep.date || !/^\d{4}-\d{2}-\d{2}$/.test(String(ep.date))) {
+      rejectedEpisodes++;
+      logError(`EPISODE-REJECTED ${ep.id ?? ep.file}: missing or invalid date (expected YYYY-MM-DD)`);
+      process.exitCode = 1;
+      return false;
+    }
+    for (const rel of ep.relations ?? []) {
+      if (!rel || typeof rel.subject !== "string" || typeof rel.predicate !== "string" || typeof rel.object !== "string") {
+        rejectedEpisodes++;
+        logError(`EPISODE-REJECTED ${ep.id ?? ep.file}: relation missing subject/predicate/object string`);
+        process.exitCode = 1;
+        return false;
+      }
+    }
+    for (const ent of ep.entities ?? []) {
+      if (!ent || typeof ent.name !== "string" || !ent.name.trim()) {
+        rejectedEpisodes++;
+        logError(`EPISODE-REJECTED ${ep.id ?? ep.file}: entity missing name string`);
+        process.exitCode = 1;
+        return false;
+      }
     }
     return true;
   });
@@ -139,7 +186,7 @@ let droppedSelfLoops = 0;
 
 for (const ep of episodes) {
   const epId = ep.id ?? ep.file.replace(/\.json$/, "");
-  const epDate = ep.date ?? new Date().toISOString().slice(0, 10);
+  const epDate = ep.date;
 
   const declared = new Map();
   for (const ent of ep.entities ?? []) declared.set(ent.name, ent);
@@ -188,8 +235,15 @@ for (const ep of episodes) {
 const invFile = DIR("invalidations.json");
 let appliedInvalidations = 0;
 if (fs.existsSync(invFile)) {
-  const inv = JSON.parse(fs.readFileSync(invFile, "utf8"));
-  for (const [key, v] of Object.entries(inv)) {
+  const inv = (() => {
+    try {
+      return JSON.parse(fs.readFileSync(invFile, "utf8"));
+    } catch (err) {
+      logError(`INVALIDATIONS-REJECTED invalidations.json: ${err.message}`);
+      return null;
+    }
+  })();
+  if (inv) for (const [key, v] of Object.entries(inv)) {
     const e = edgeIndex.get(key);
     if (!e) {
       logError(`INVALIDATION-TARGET-MISSING "${key}"`);
@@ -202,7 +256,7 @@ if (fs.existsSync(invFile)) {
 }
 
 writeJSONL(DIR("nodes.jsonl"), nodes.sort((a, b) => a.id.localeCompare(b.id)));
-writeJSONL(DIR("edges.jsonl"), edges.sort((a, b) => a.subject.localeCompare(b.subject)));
+writeJSONL(DIR("edges.jsonl"), edges.sort((a, b) => a.subject.localeCompare(b.subject) || a.predicate.localeCompare(b.predicate) || a.object.localeCompare(b.object)));
 
 console.log(
   `assemble ok | episodes: ${episodes.length} (rejected ${rejectedEpisodes}) | nodes: ${nodes.length} (+${addedNodes}) | edges: ${edges.length} (+${addedEdges}, deduped ${mergedEdges}) | self-loops dropped: ${droppedSelfLoops} | dangling refs: ${fallbacks} | invalidations: ${appliedInvalidations}`
