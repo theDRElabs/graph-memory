@@ -1,0 +1,25 @@
+{
+  "id": "2026-10-05-capture-stdin",
+  "source": "stdin",
+  "date": "2026-10-05",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "Termux",
+      "type": "CONCEPT",
+      "description": "candidate — review type"
+    },
+    {
+      "name": "proot-distro and Vercel depends on Next.js",
+      "type": "CONCEPT",
+      "description": "candidate — review type"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "Termux",
+      "predicate": "depends-on",
+      "object": "proot-distro and Vercel depends on Next.js"
+    }
+  ]
+}

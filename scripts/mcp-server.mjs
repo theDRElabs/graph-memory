@@ -65,6 +65,18 @@ const tools = [
     },
   },
   {
+    name: "graph_search",
+    description: "Ranked full-text search over node name/description/aliases/type (FTS5 via node:sqlite, substring fallback).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Search text" },
+        top: { type: "number", description: "Max results (default 10)" },
+      },
+      required: ["query"],
+    },
+  },
+  {
     name: "graph_stats",
     description: "Report episode/node/edge counts and whether errors.log is non-empty.",
     inputSchema: { type: "object", properties: {} },
@@ -108,6 +120,14 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       fs.writeFileSync(invFile, JSON.stringify(inv, null, 2) + "\n");
       const out = runAssemble();
       return { content: [{ type: "text", text: `invalidated ${key}\n${out}` }] };
+    }
+    if (req.params.name === "graph_search") {
+      if (!args.query || typeof args.query !== "string")
+        throw new Error("query is required");
+      const argv = [path.join(ROOT, "scripts", "graph-search.mjs"), args.query];
+      if (args.top) argv.push(`--top=${Number(args.top)}`);
+      const out = execFileSync(process.execPath, argv, { cwd: ROOT, encoding: "utf8" });
+      return { content: [{ type: "text", text: out }] };
     }
     if (req.params.name === "graph_stats") {
       const count = (f) =>
