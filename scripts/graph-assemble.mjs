@@ -98,6 +98,14 @@ const episodes = fs
       process.exitCode = 1;
       return false;
     }
+    // G8: schema_version, default "1", only "1" supported
+    const sv = ep.schema_version === undefined ? "1" : String(ep.schema_version);
+    if (sv !== "1") {
+      rejectedEpisodes++;
+      logError(`EPISODE-REJECTED ${ep.id ?? ep.file}: unsupported schema_version "${sv}" (known: "1")`);
+      process.exitCode = 1;
+      return false;
+    }
     for (const rel of ep.relations ?? []) {
       if (!rel || typeof rel.subject !== "string" || typeof rel.predicate !== "string" || typeof rel.object !== "string") {
         rejectedEpisodes++;
@@ -274,7 +282,14 @@ if (fs.existsSync(invFile)) {
       return null;
     }
   })();
-  if (inv) for (const [key, v] of Object.entries(inv)) {
+  if (inv && (typeof inv !== "object" || Array.isArray(inv))) {
+    logError(`INVALIDATIONS-REJECTED invalidations.json: expected object mapping edge keys to {invalid_at, superseded_by}`);
+  } else if (inv) for (const [key, v] of Object.entries(inv)) {
+    // G15: per-entry shape validation
+    if (!v || typeof v !== "object" || Array.isArray(v) || (v.invalid_at !== undefined && typeof v.invalid_at !== "string") || (v.superseded_by !== undefined && typeof v.superseded_by !== "string")) {
+      logError(`INVALIDATIONS-REJECTED "${key}": expected object with optional string invalid_at/superseded_by`);
+      continue;
+    }
     const e = edgeIndex.get(key);
     if (!e) {
       logError(`INVALIDATION-TARGET-MISSING "${key}"`);
@@ -283,6 +298,30 @@ if (fs.existsSync(invFile)) {
     e.invalid_at = v.invalid_at ?? null;
     e.superseded_by = v.superseded_by ?? null;
     appliedInvalidations++;
+  }
+}
+
+// G14: validate superseded_by chains (targets exist, no cycles).
+let supersededIssues = 0;
+for (const e of edges) {
+  if (!e.superseded_by) continue;
+  const target = String(e.superseded_by);
+  if (!edgeIndex.has(target)) {
+    supersededIssues++;
+    logError(`SUPERSEDED-BY-MISSING "${edgeKey(e.subject, e.predicate, e.object)}" -> "${target}"`);
+    continue;
+  }
+  const seen = new Set([edgeKey(e.subject, e.predicate, e.object)]);
+  let cur = target;
+  while (cur) {
+    if (seen.has(cur)) {
+      supersededIssues++;
+      logError(`SUPERSEDED-BY-CYCLE "${edgeKey(e.subject, e.predicate, e.object)}"`);
+      break;
+    }
+    seen.add(cur);
+    const next = edgeIndex.get(cur);
+    cur = next && next.superseded_by ? String(next.superseded_by) : null;
   }
 }
 
@@ -332,5 +371,5 @@ writeJSONL(DIR("nodes.jsonl"), nodes.sort((a, b) => a.id.localeCompare(b.id)));
 writeJSONL(DIR("edges.jsonl"), edges.sort((a, b) => a.subject.localeCompare(b.subject) || a.predicate.localeCompare(b.predicate) || a.object.localeCompare(b.object)));
 
 console.log(
-  `assemble ok | episodes: ${episodes.length} (rejected ${rejectedEpisodes}) | nodes: ${nodes.length} (+${addedNodes}) | edges: ${edges.length} (+${addedEdges}, deduped ${mergedEdges}) | self-loops dropped: ${droppedSelfLoops} | dangling refs: ${fallbacks} | invalidations: ${appliedInvalidations} | contradictions: ${contradictions}`
+  `assemble ok | episodes: ${episodes.length} (rejected ${rejectedEpisodes}) | nodes: ${nodes.length} (+${addedNodes}) | edges: ${edges.length} (+${addedEdges}, deduped ${mergedEdges}) | self-loops dropped: ${droppedSelfLoops} | dangling refs: ${fallbacks} | invalidations: ${appliedInvalidations} | contradictions: ${contradictions} | superseded-by-issues: ${supersededIssues}`
 );
