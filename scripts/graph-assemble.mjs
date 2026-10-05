@@ -24,12 +24,19 @@ try {
 } catch (err) {
   logError(`RESOLVE-REJECTED resolve.json: ${err.message}`);
 }
-for (const c of resolveData.clusters ?? []) {
+if (!resolveData || typeof resolveData !== "object" || Array.isArray(resolveData)) {
+  logError(`RESOLVE-REJECTED resolve.json: expected an object with "clusters" array`);
+  resolveData = { clusters: [] };
+}
+const clusters = (Array.isArray(resolveData.clusters) ? resolveData.clusters : []).filter(
+  (c) => c && typeof c.canonical === "string" && c.canonical.trim()
+);
+for (const c of clusters) {
   if ((c.aliases?.length ?? 0) > 4)
     logError(`OVER-MERGE-RISK cluster "${c.canonical}" has ${c.aliases.length} aliases - review manually`);
 }
 const aliasOwner = new Map();
-for (const c of resolveData.clusters ?? []) {
+for (const c of clusters) {
   for (const nm of [c.canonical.toLowerCase(), ...(c.aliases ?? []).map((a) => a.toLowerCase())]) {
     const owner = aliasOwner.get(nm);
     if (owner && owner !== c.canonical)
@@ -40,13 +47,13 @@ for (const c of resolveData.clusters ?? []) {
   }
 }
 const aliasToCanonical = new Map();
-for (const c of resolveData.clusters ?? []) {
+for (const c of clusters) {
   aliasToCanonical.set(c.canonical.toLowerCase(), c.canonical);
   for (const a of c.aliases ?? []) aliasToCanonical.set(a.toLowerCase(), c.canonical);
 }
 
 const clusterByName = new Map();
-for (const c of resolveData.clusters ?? []) clusterByName.set(c.canonical.toLowerCase(), c);
+for (const c of clusters) clusterByName.set(c.canonical.toLowerCase(), c);
 
 let rejectedEpisodes = 0;
 const episodes = fs
@@ -111,7 +118,7 @@ const episodes = fs
   });
 
 const declaredNames = new Set();
-for (const c of resolveData.clusters ?? []) {
+for (const c of clusters) {
   declaredNames.add(c.canonical.toLowerCase());
   for (const a of c.aliases ?? []) declaredNames.add(a.toLowerCase());
 }
