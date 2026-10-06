@@ -406,3 +406,24 @@ writeJSONL(DIR("edges.jsonl"), edges.sort((a, b) => a.subject.localeCompare(b.su
 console.log(
   `assemble ok | episodes: ${episodes.length} (rejected ${rejectedEpisodes}) | nodes: ${nodes.length} (+${addedNodes}) | edges: ${edges.length} (+${addedEdges}, deduped ${mergedEdges}) | self-loops dropped: ${droppedSelfLoops} | dangling refs: ${fallbacks} | invalidations: ${appliedInvalidations} | contradictions: ${contradictions} | superseded-by-issues: ${supersededIssues}`
 );
+
+// After every assemble, surface candidate episodes awaiting approval.
+try {
+  const candDir = DIR("episodes/candidates");
+  const pending = fs.existsSync(candDir)
+    ? fs.readdirSync(candDir).filter((f) => f.endsWith(".json"))
+    : [];
+  if (pending.length > 0) {
+    console.log(`\n${pending.length} candidate(s) awaiting approval — digest:`);
+    const { execFileSync } = await import("node:child_process");
+    process.stdout.write(
+      execFileSync(process.execPath, [path.join(ROOT, "scripts", "approval-digest.mjs")], {
+        cwd: ROOT,
+        encoding: "utf8",
+        env: process.env,
+      })
+    );
+  }
+} catch {
+  // digest is best-effort; never fail the assemble
+}
