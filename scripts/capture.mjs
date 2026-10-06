@@ -147,3 +147,18 @@ fs.writeFileSync(out, JSON.stringify(episode, null, 2) + "\n");
 console.log(`captured ${relations.length} candidate relation(s), ${entities.size} entit(y/ies)`);
 console.log(`candidate episode: ${out}`);
 console.log(`review, then move it into episodes/ and run: node scripts/graph-assemble.mjs`);
+
+// Automatically trigger assemble so the approval digest (and email, if configured)
+// fires immediately after a capture — no manual step needed.
+try {
+  const { execFileSync } = await import("node:child_process");
+  process.stdout.write(
+    execFileSync(process.execPath, [path.join(ROOT, "scripts", "graph-assemble.mjs")], {
+      cwd: ROOT,
+      encoding: "utf8",
+      env: process.env,
+    })
+  );
+} catch (err) {
+  console.error(`[capture] assemble after capture failed: ${err.message}`);
+}
