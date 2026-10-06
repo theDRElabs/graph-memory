@@ -17,13 +17,32 @@ const writeJSONL = (f, arr) => {
 
 // G5: single-writer lockfile around the whole assemble run.
 const LOCK = DIR(".assemble.lock");
-try {
-  fs.writeFileSync(LOCK, String(process.pid), { flag: "wx" });
-} catch {
-  console.error(`another assemble is running (lockfile ${LOCK} exists) — refusing to run`);
-  process.exit(1);
+const pidAlive = (pid) => {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+};
+if (fs.existsSync(LOCK)) {
+  const holder = parseInt(fs.readFileSync(LOCK, "utf8"), 10);
+  if (Number.isFinite(holder) && pidAlive(holder)) {
+    console.error(`another assemble is running (pid ${holder}, lockfile ${LOCK}) — refusing to run`);
+    process.exit(1);
+  }
+  // Stale lock from a crashed/killed run — reclaim it.
+  fs.rmSync(LOCK, { force: true });
 }
-process.on("exit", () => fs.rmSync(LOCK, { force: true }));
+fs.writeFileSync(LOCK, String(process.pid), { flag: "wx" });
+const releaseLock = () => fs.rmSync(LOCK, { force: true });
+process.on("exit", releaseLock);
+for (const sig of ["SIGINT", "SIGTERM"]) {
+  process.on(sig, () => {
+    releaseLock();
+    process.exit(130);
+  });
+}
 const logError = (msg) =>
   fs.appendFileSync(DIR("errors.log"), `${new Date().toISOString()} ${msg}\n`);
 

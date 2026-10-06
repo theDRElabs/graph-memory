@@ -40,11 +40,27 @@ const render = (ranked) => {
   if (ranked.length > top) console.error(`[search] ${ranked.length} matches, showing top ${top} (--top=N to change)`);
 };
 
+const edges = readJSONL(DIR("edges.jsonl"));
+const predsByNode = new Map();
+for (const e of edges) {
+  for (const id of [e.subject, e.object]) {
+    if (!predsByNode.has(id)) predsByNode.set(id, new Set());
+    predsByNode.get(id).add(String(e.predicate ?? ""));
+  }
+}
+const nodePredicates = (n) => [...(predsByNode.get(n.id) ?? [])].join(" ");
+
+// G2: blend match rank with confidence and recency into one score (lower = better).
+const TODAY = new Date().toISOString().slice(0, 10);
+const recencyBonus = (created) => {
+  if (!created || typeof created !== "string") return 0;
+  const ageDays = (Date.parse(TODAY) - Date.parse(created)) / 86400000;
+  return ageDays >= 0 && ageDays <= 30 ? 0.1 : 0;
+};
 const byRelevance = (a, b) =>
-  (a.rank - b.rank) ||
-  ((b.node.confidence ?? 0) - (a.node.confidence ?? 0)) ||
-  String(b.node.created_at ?? "").localeCompare(String(a.node.created_at ?? "")) ||
-  a.node.id.localeCompare(b.node.id);
+  adjustedRank(a) - adjustedRank(b) || a.node.id.localeCompare(b.node.id);
+const adjustedRank = (r) =>
+  r.rank - 0.15 * (r.node.confidence ?? 0) - recencyBonus(r.node.created_at);
 
 let DatabaseSync = null;
 try {
@@ -57,16 +73,17 @@ try {
 if (DatabaseSync) {
   try {
     const db = new DatabaseSync(":memory:");
-    db.exec("CREATE VIRTUAL TABLE fts USING fts5(name, description, aliases, type)");
+    db.exec("CREATE VIRTUAL TABLE fts USING fts5(name, description, aliases, type, predicates)");
     const ins = db.prepare(
-      "INSERT INTO fts(name, description, aliases, type) VALUES (?, ?, ?, ?)"
+      "INSERT INTO fts(name, description, aliases, type, predicates) VALUES (?, ?, ?, ?, ?)"
     );
     nodes.forEach((n) =>
       ins.run(
         String(n.name ?? ""),
         String(n.description ?? ""),
         (n.aliases ?? []).join(" "),
-        String(n.type ?? "")
+        String(n.type ?? ""),
+        nodePredicates(n)
       )
     );
     const terms = query
@@ -97,7 +114,7 @@ if (DatabaseSync) {
 const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
 const scored = [];
 for (const n of nodes) {
-  const blob = `${n.name ?? ""}\n${n.description ?? ""}\n${(n.aliases ?? []).join(" ")}\n${n.type ?? ""}`.toLowerCase();
+  const blob = `${n.name ?? ""}\n${n.description ?? ""}\n${(n.aliases ?? []).join(" ")}\n${n.type ?? ""}\n${nodePredicates(n)}`.toLowerCase();
   const hits = terms.filter((t) => blob.includes(t)).length;
   if (hits > 0) scored.push({ rank: -hits, node: n });
 }
