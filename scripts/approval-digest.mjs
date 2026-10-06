@@ -27,18 +27,31 @@ if (files.length === 0) {
   process.exit(0);
 }
 
-const lines = [`${files.length} candidate episode(s) pending approval:`];
-for (const f of files) {
+const lines = [
+  `You have ${files.length} note(s) waiting for your review.`,
+  ``,
+  `These are facts your AI agent captured but has NOT saved yet — they are in a draft tray. Nothing is permanent until you approve.`,
+  ``,
+];
+for (const [i, f] of files.entries()) {
   try {
     const ep = JSON.parse(fs.readFileSync(path.join(CAND_DIR, f), "utf8"));
-    lines.push(
-      `- ${f}: ${ep.relations?.length ?? 0} relation(s), ${ep.entities?.length ?? 0} entit(y/ies), source=${ep.source}, date=${ep.date}`
-    );
+    lines.push(`${i + 1}. From: ${ep.source === "stdin" ? "a paste/conversation" : ep.source}`);
+    lines.push(`   Date captured: ${ep.date}`);
+    lines.push(`   It contains these ${ep.relations?.length ?? 0} fact(s):`);
+    for (const r of ep.relations ?? []) {
+      lines.push(`     • ${r.subject} ${r.predicate.replace(/-/g, " ")} ${r.object}`);
+    }
+    lines.push(`   To KEEP this: tell me "approve ${f}" — or move the file into episodes/ yourself.`);
+    lines.push(`   To DISCARD it: tell me "reject ${f}" — or just delete the file.`);
+    lines.push(``);
   } catch {
-    lines.push(`- ${f}: (unreadable)`);
+    lines.push(`${i + 1}. ${f}: (could not read this one)`);
+    lines.push(``);
   }
 }
-lines.push("Approve with: mv episodes/candidates/<file> episodes/ && node scripts/graph-assemble.mjs");
+lines.push(`—`);
+lines.push(`What happens next: approved notes become searchable memory for your agent. Rejected ones are simply forgotten.`);
 
 const digest = lines.join("\n");
 console.log(digest);
@@ -54,7 +67,7 @@ if (process.env.GRAPH_RESEND_API_KEY && process.env.GRAPH_EMAIL_TO) {
       body: JSON.stringify({
         from: "graph-memory <digest@resend.dev>",
         to: process.env.GRAPH_EMAIL_TO,
-        subject: `[graph-memory] ${files.length} candidate(s) awaiting approval`,
+        subject: `[graph-memory] ${files.length} note(s) need your review`,
         text: digest,
       }),
     });
