@@ -111,7 +111,13 @@ if (relations.length === 0) {
   process.exit(2);
 }
 
-const date = new Date().toISOString().slice(0, 10);
+// Prefer a date mentioned in the source text (e.g. a "date: YYYY-MM-DD" frontmatter
+// field, ISO date in prose) over "today"; fall back to today only if none found.
+const sourceDate = (() => {
+  const m = text.match(/\b(20\d{2}-\d{2}-\d{2})\b/);
+  return m ? m[1] : new Date().toISOString().slice(0, 10);
+})();
+const date = sourceDate;
 const slug = (s) =>
   String(s).toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "capture";
 
@@ -120,7 +126,12 @@ fs.mkdirSync(candidatesDir, { recursive: true });
 
 let id = `${date}-capture-${slug(path.basename(source))}`;
 let n = 2;
-while (fs.existsSync(path.join(candidatesDir, `${id}.json`))) id = `${date}-capture-${slug(path.basename(source))}-${n++}`;
+// Check both candidates/ and the live episodes/ dir — once a candidate is approved
+// and moved, its id must still block re-issuing a duplicate.
+const taken = (candidateId) =>
+  fs.existsSync(path.join(candidatesDir, `${candidateId}.json`)) ||
+  fs.existsSync(path.join(ROOT, "episodes", `${candidateId}.json`));
+while (taken(id)) id = `${date}-capture-${slug(path.basename(source))}-${n++}`;
 
 const episode = {
   id,
