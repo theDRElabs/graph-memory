@@ -1,0 +1,30 @@
+{
+  "id": "2026-10-06-harness-contract",
+  "source": "/workspaces/Opencode/HARNESS-CONTRACT.md (harness phase 1) and HARNESS-PHASE-1-VALIDATION.md",
+  "date": "2026-10-06",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "harness contract",
+      "type": "ARTIFACT",
+      "description": "HARNESS-CONTRACT.md - short always-loaded rules: intent-to-acceptance lifecycle, human/agent/repository responsibility split, six artifact handoffs, verification separation, HITL vs AFK, documentation lifecycle"
+    },
+    {
+      "name": "verification separation",
+      "type": "CONCEPT",
+      "description": "Rule that the producer of a substantial change must never be its only verifier; each harness phase ships an independent verifier findings record alongside its fixtures"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "harness contract",
+      "predicate": "governs",
+      "object": "Opencode harness repo"
+    },
+    {
+      "subject": "harness contract",
+      "predicate": "mandates",
+      "object": "verification separation"
+    }
+  ]
+}

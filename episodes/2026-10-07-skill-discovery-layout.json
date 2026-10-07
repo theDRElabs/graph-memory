@@ -1,0 +1,45 @@
+{
+  "id": "2026-10-07-skill-discovery-layout",
+  "source": "live directory listing of ~/.config/opencode/ on 2026-10-07, plus https://opencode.ai/docs/skills/ discovery paths",
+  "date": "2026-10-07",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "global opencode config dir",
+      "type": "LOCATION",
+      "description": "~/.config/opencode - holds opencode.jsonc (MCP servers incl. graph-memory), symlinks to AGENTS.md/HARNESS-*.md, and skills/ + commands/ pointing into harness repos"
+    },
+    {
+      "name": "OpenCode skill discovery",
+      "type": "CONCEPT",
+      "description": "Skills load only from ~/.config/opencode/skills/<name>/SKILL.md, .opencode/skills/, or the ~/.claude and ~/.agents equivalents; a repo's own skills/ or commands/ directory is NOT discovered"
+    },
+    {
+      "name": "graph-memory skill",
+      "type": "ARTIFACT",
+      "description": "SKILL.md in the opencode-config repo documenting the Extract-Resolve-Assemble-Query loop, provenance rules, and safety rails"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "OpenCode skill discovery",
+      "predicate": "reads-from",
+      "object": "global opencode config dir"
+    },
+    {
+      "subject": "grill-me skill",
+      "predicate": "installed-in",
+      "object": "global opencode config dir"
+    },
+    {
+      "subject": "write-prd skill",
+      "predicate": "installed-in",
+      "object": "global opencode config dir"
+    },
+    {
+      "subject": "graph-memory skill",
+      "predicate": "installed-in",
+      "object": "global opencode config dir"
+    }
+  ]
+}

@@ -45,6 +45,44 @@
         "affaan-m/ECC"
       ],
       "description": "affaan-m/ECC 'Everything Claude Code' community pack audited 2026-08-23"
+    },
+    {
+      "canonical": "Opencode harness repo",
+      "type": "REPO",
+      "aliases": [
+        "harness repo",
+        "/workspaces/Opencode",
+        "the harness"
+      ],
+      "description": "Private repo holding the agent harness: contract, roadmap, per-phase validation docs, skills/, commands/, fixtures"
+    },
+    {
+      "canonical": "grill-me skill",
+      "type": "ARTIFACT",
+      "aliases": [
+        "grill-me",
+        "/grill-me",
+        "alignment interview"
+      ],
+      "description": "One-question-at-a-time alignment interview skill producing a labeled alignment record; forbids code edits"
+    },
+    {
+      "canonical": "write-prd skill",
+      "type": "ARTIFACT",
+      "aliases": [
+        "write-prd",
+        "/write-prd",
+        "destination writer"
+      ],
+      "description": "Turns a confirmed alignment record into a bounded destination document; carries unknown/human-gated labels forward"
+    },
+    {
+      "canonical": "graph-memory skill",
+      "type": "ARTIFACT",
+      "aliases": [
+        "the graph skill"
+      ],
+      "description": "Extract-Resolve-Assemble-Query workflow doc for the knowledge graph store, symlinked into ~/.config/opencode/skills/"
     }
   ]
 }

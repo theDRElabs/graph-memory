@@ -1,0 +1,35 @@
+{
+  "id": "2026-10-06-codespace-host",
+  "source": "/workspaces/Opencode/AGENTS.md host-context section, read and cross-checked against the live instance layout (/workspaces, user codespace) on 2026-10-06",
+  "date": "2026-10-06",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "Codespace host",
+      "type": "LOCATION",
+      "description": "GitHub Codespace, always-on cloud dev container, x86_64, user codespace, home /home/codespace, repos under /workspaces"
+    },
+    {
+      "name": "host migration to Codespace",
+      "type": "EVENT",
+      "description": "Device moved off the phone/Termux setup and the EC2/WSL2 box to a Codespace; AGENTS.md states phone-era build lessons and EC2 sideload/proot procedures no longer apply"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "graph-memory repo",
+      "predicate": "located-on",
+      "object": "Codespace host"
+    },
+    {
+      "subject": "graph system",
+      "predicate": "runs-on",
+      "object": "Codespace host"
+    },
+    {
+      "subject": "host migration to Codespace",
+      "predicate": "replaced",
+      "object": "Termux environment"
+    }
+  ]
+}

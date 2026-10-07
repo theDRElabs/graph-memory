@@ -1,0 +1,6 @@
+{
+  "graph-system|runs-on|termux-environment": {
+    "invalid_at": "2026-10-06",
+    "superseded_by": "graph-system|runs-on|codespace-host"
+  }
+}

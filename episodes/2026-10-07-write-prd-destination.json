@@ -1,0 +1,40 @@
+{
+  "id": "2026-10-07-write-prd-destination",
+  "source": "/workspaces/Opencode/HARNESS-PHASE-3-VALIDATION.md, fixtures/phase3-destination/, git commits 2026-10-07",
+  "date": "2026-10-07",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "write-prd skill",
+      "type": "ARTIFACT",
+      "description": "skills/write-prd/SKILL.md + commands/write-prd.md - converts a confirmed alignment record into a 12-heading destination document; carries UNKNOWN/HITL/RESEARCH forward and forbids code, module paths, endpoints, estimates, and issue-generation authorization"
+    },
+    {
+      "name": "destination document",
+      "type": "CONCEPT",
+      "description": "Phase-boundary artifact: problem, users, solution, observable stories, checkable acceptance criteria, data behavior, contracts, module map, tests, security constraints, non-goals, rejected decisions, risks"
+    },
+    {
+      "name": "authored-vs-generated evidence gap",
+      "type": "CONCEPT",
+      "description": "A gate worded 'generated fixtures' is not satisfied by hand-authored walkthroughs; authored fixtures prove the artifact contract is satisfiable and checkable, not that an agent reliably produces it"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "write-prd skill",
+      "predicate": "consumes",
+      "object": "alignment record"
+    },
+    {
+      "subject": "write-prd skill",
+      "predicate": "produces",
+      "object": "destination document"
+    },
+    {
+      "subject": "authored-vs-generated evidence gap",
+      "predicate": "explains-status-of",
+      "object": "write-prd skill"
+    }
+  ]
+}

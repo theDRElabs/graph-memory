@@ -1,0 +1,40 @@
+{
+  "id": "2026-10-07-grill-me-alignment",
+  "source": "/workspaces/Opencode/HARNESS-PHASE-2-VALIDATION.md, fixtures/phase2-alignment/, git commits 2026-10-06..2026-10-07",
+  "date": "2026-10-07",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "grill-me skill",
+      "type": "ARTIFACT",
+      "description": "skills/grill-me/SKILL.md + commands/grill-me.md - one question per turn with a provisional recommended answer; output is an alignment record labeled DECIDED/ASSUMED/UNKNOWN/HITL/RESEARCH, never code or a plan"
+    },
+    {
+      "name": "alignment record",
+      "type": "CONCEPT",
+      "description": "Phase-boundary artifact: decisions, assumptions, recommendations, open questions, non-goals, unresolved risks"
+    },
+    {
+      "name": "live grill-me session",
+      "type": "EVENT",
+      "description": "2026-10-07 human-driven /grill-me run in the TUI, session ses_ee85bf5a3ffeJVTaFQTbsagVBC, 28 question calls (25 real answers), extracted to fixtures/phase2-alignment/live-human-run.md"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "grill-me skill",
+      "predicate": "produces",
+      "object": "alignment record"
+    },
+    {
+      "subject": "alignment record",
+      "predicate": "consumed-by",
+      "object": "write-prd skill"
+    },
+    {
+      "subject": "grill-me skill",
+      "predicate": "demonstrated-by",
+      "object": "live grill-me session"
+    }
+  ]
+}

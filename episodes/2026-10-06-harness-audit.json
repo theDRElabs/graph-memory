@@ -1,0 +1,35 @@
+{
+  "id": "2026-10-06-harness-audit",
+  "source": "/workspaces/Opencode/HARNESS-AUDIT.md (harness phase 0), git commits 2026-10-06",
+  "date": "2026-10-06",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "Opencode harness repo",
+      "type": "REPO",
+      "description": "Private repo at /workspaces/Opencode holding HARNESS-CONTRACT.md, HARNESS-ROADMAP.md, per-phase validation docs, skills/, commands/, and fixtures/"
+    },
+    {
+      "name": "harness audit",
+      "type": "ARTIFACT",
+      "description": "HARNESS-AUDIT.md - phase 0 read-only inventory of active config, instructions, agents, commands, skills, MCPs, and permissions; completed, changed no active configuration"
+    },
+    {
+      "name": "harness roadmap",
+      "type": "ARTIFACT",
+      "description": "HARNESS-ROADMAP.md - control document listing 24 numbered phases with a pending/in_progress/blocked/completed legend, per-phase goal, work, and completion gate"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "harness audit",
+      "predicate": "audits",
+      "object": "Opencode harness repo"
+    },
+    {
+      "subject": "harness roadmap",
+      "predicate": "sequences-phases-of",
+      "object": "Opencode harness repo"
+    }
+  ]
+}
