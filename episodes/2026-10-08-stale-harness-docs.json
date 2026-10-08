@@ -14,7 +14,7 @@
       "description": "graph-assemble.mjs sets a node description only at creation and fills blanks afterwards, so a wrong description cannot be corrected by adding a new episode - it can only be changed by editing the original episode, which the store's append-only contract forbids. No override map, no last-writer-wins, no superseded_by for descriptions. Node type is create-only for the same reason: UNKNOWN upgrades to a hint type, any other mismatch logs TYPE-CONFLICT and is ignored"
     },
     { "name": "AGENTS.md", "type": "ARTIFACT" },
-    { "name": "stale-by-supersession descriptions", "type": "CONCEPT", description: "Node descriptions that were accurate when written and are now outdated rather than wrong - they are shadowed by an invalidated edge, not by a correction. The Termux environment summary ('Android terminal hosting the entire dev setup') is this kind: true for Aug 2026, superseded by the 2026-10-06 invalidation, not an error needing correction" }
+    { "name": "stale-by-supersession descriptions", "type": "CONCEPT", "description": "Node descriptions that were accurate when written and are now outdated rather than wrong - they are shadowed by an invalidated edge, not by a correction. The Termux environment summary ('Android terminal hosting the entire dev setup') is this kind: true for Aug 2026, superseded by the 2026-10-06 invalidation, not an error needing correction" }
   ],
   "relations": [
     {
