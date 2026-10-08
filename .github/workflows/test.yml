@@ -14,3 +14,24 @@ jobs:
       - run: node --test tests/graph.test.mjs
       - name: assemble real graph
         run: node scripts/graph-assemble.mjs
+      # Consumers (mcp-server.mjs, graph-query.mjs, graph-search.mjs) read
+      # nodes.jsonl/edges.jsonl directly and never assemble. If the committed
+      # artifacts drift from the episodes, a clone silently serves stale facts
+      # with no error anywhere.
+      - name: derived artifacts are committed and current
+        run: |
+          if ! git diff --exit-code -- nodes.jsonl edges.jsonl errors.log; then
+            echo "::error::Derived artifacts are stale. Run 'node scripts/graph-assemble.mjs' and commit nodes.jsonl, edges.jsonl, errors.log."
+            git --no-pager diff --stat -- nodes.jsonl edges.jsonl errors.log
+            exit 1
+          fi
+      # errors.log is rewritten every assemble, so a non-empty one means the
+      # last build logged problems. A committed non-empty log reproduces
+      # identically and would pass the diff check above, so assert it directly.
+      - name: errors.log is empty
+        run: |
+          if [ -s errors.log ]; then
+            echo "::error::errors.log is not empty; the last assemble logged problems."
+            cat errors.log
+            exit 1
+          fi
