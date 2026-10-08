@@ -17,7 +17,7 @@
     {
       "name": "AGENTS.md",
       "type": "ARTIFACT",
-      "description": "Global rules loaded every session: host context, user-mandated communication rules, build pipeline, harness fixture intake, graph-memory workflow, harness contract/roadmap governance. Lives at /workspaces/Opencode/AGENTS.md, symlinked into ~/.config/opencode/"
+      "description": "Global rules loaded every session: host context, user-mandated communication rules, build pipeline, harness fixture intake, graph-memory workflow, harness contract/roadmap governance. Lives at /workspaces/Opencode/AGENTS.md, symlinked into ~/.config/opencode/. WARNING: the engine cannot apply this text - the 2026-08-22 seed declares AGENTS.md first and node descriptions are set only at creation, so nodes.jsonl still carries the seed's superseded summary. This block is inert until a description override exists"
     }
   ],
   "relations": [

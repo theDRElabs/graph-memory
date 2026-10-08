@@ -1,1 +1,5 @@
 node_modules
+
+# Unapproved draft facts awaiting human review. Not part of the store's
+# source of truth until moved into episodes/.
+episodes/candidates/

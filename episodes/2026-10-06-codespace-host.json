@@ -12,7 +12,7 @@
     {
       "name": "host migration to Codespace",
       "type": "EVENT",
-      "description": "Device host changed to a GitHub Codespace, displacing an earlier AWS EC2/WSL2 box and, before that, the phone/Termux setup (HARNESS-AUDIT.md:37-41 documents the EC2 interlude via leftover /home/ubuntu paths). Exact move date not established by any source; bounded only to before 2026-10-07"
+      "description": "Device host changed to a GitHub Codespace, displacing an earlier AWS EC2/WSL2 box (HARNESS-AUDIT.md:26-28, via the injected-vs-on-disk AGENTS.md mismatch) and, before that, the phone/Termux setup (leftover /home/ubuntu paths from that host are recorded at HARNESS-AUDIT.md:37-41). No source establishes the move date; 2026-10-06 is only this episode's date field, and the edge valid_at and the invalidation invalid_at derive from it, so both mean 'in this state as of 2026-10-06', not 'the move happened that day'"
     }
   ],
   "relations": [
