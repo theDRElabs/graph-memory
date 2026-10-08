@@ -1,3 +1,4 @@
+{"subject":"agents-md","predicate":"description-not-correctable-by","object":"description-override-gap","episodes":["2026-10-08-stale-harness-docs"],"valid_at":"2026-10-08","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"agents-md","predicate":"mandates","object":"noreply-git-email","episodes":["2026-08-22-graph-system-seed"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"alignment-record","predicate":"consumed-by","object":"write-prd-skill","episodes":["2026-10-07-grill-me-alignment"],"valid_at":"2026-10-07","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"authored-vs-generated-evidence-gap","predicate":"explains-status-of","object":"write-prd-skill","episodes":["2026-10-07-write-prd-destination"],"valid_at":"2026-10-07","invalid_at":null,"superseded_by":null,"confidence":0.5}
@@ -23,8 +24,12 @@
 {"subject":"grill-me-skill","predicate":"installed-in","object":"global-opencode-config-dir","episodes":["2026-10-07-skill-discovery-layout"],"valid_at":"2026-10-07","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"grill-me-skill","predicate":"produces","object":"alignment-record","episodes":["2026-10-07-grill-me-alignment"],"valid_at":"2026-10-07","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"harness-audit","predicate":"audits","object":"opencode-harness-repo","episodes":["2026-10-06-harness-audit"],"valid_at":"2026-10-06","invalid_at":null,"superseded_by":null,"confidence":0.5}
+{"subject":"harness-audit","predicate":"has-stale-paths-in","object":"agents-md","episodes":["2026-10-08-stale-harness-docs"],"valid_at":"2026-10-08","invalid_at":null,"superseded_by":null,"confidence":0.5}
+{"subject":"harness-audit","predicate":"summary-shadowed-by","object":"stale-by-supersession-descriptions","episodes":["2026-10-08-stale-harness-docs"],"valid_at":"2026-10-08","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"harness-contract","predicate":"governs","object":"opencode-harness-repo","episodes":["2026-10-06-harness-contract"],"valid_at":"2026-10-06","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"harness-contract","predicate":"mandates","object":"verification-separation","episodes":["2026-10-06-harness-contract"],"valid_at":"2026-10-06","invalid_at":null,"superseded_by":null,"confidence":0.5}
+{"subject":"harness-phase-status","predicate":"reported-in","object":"harness-roadmap","episodes":["2026-10-08-harness-phase-status"],"valid_at":"2026-10-08","invalid_at":null,"superseded_by":null,"confidence":0.5}
+{"subject":"harness-phase-status","predicate":"summarized-in","object":"agents-md","episodes":["2026-10-08-harness-phase-status"],"valid_at":"2026-10-08","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"harness-roadmap","predicate":"sequences-phases-of","object":"opencode-harness-repo","episodes":["2026-10-06-harness-audit"],"valid_at":"2026-10-06","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"heavy-local-builds","predicate":"prefer-offloading-to","object":"github-actions","episodes":["2026-08-22-graph-system-seed"],"valid_at":"2026-08-22","invalid_at":null,"superseded_by":null,"confidence":0.5}
 {"subject":"host-migration-to-codespace","predicate":"replaced","object":"termux-environment","episodes":["2026-10-06-codespace-host"],"valid_at":"2026-10-06","invalid_at":null,"superseded_by":null,"confidence":0.5}
