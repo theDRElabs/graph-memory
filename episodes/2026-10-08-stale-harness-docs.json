@@ -1,0 +1,37 @@
+{
+  "id": "2026-10-08-stale-harness-docs",
+  "source": "Independent verifier pass over the graph backfill (2026-10-08), cross-checked against the live files",
+  "date": "2026-10-08",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "harness audit",
+      "type": "ARTIFACT",
+      "description": "HARNESS-AUDIT.md - phase 0 read-only inventory of active config, instructions, agents, commands, skills, MCPs, and permissions. Stale in one respect: it records AGENTS.md symlinked from opencode-config, but the live symlink is /workspaces/Opencode/AGENTS.md"
+    },
+    {
+      "name": "description override gap",
+      "type": "CONCEPT",
+      "description": "graph-assemble.mjs sets a node description only at creation and fills blanks afterwards, so a wrong description cannot be corrected by adding a new episode - it can only be changed by editing the original episode, which the store's append-only contract forbids. No override map, no last-writer-wins, no superseded_by for descriptions"
+    },
+    { "name": "Termux environment", "type": "TOOL" },
+    { "name": "AGENTS.md", "type": "ARTIFACT" }
+  ],
+  "relations": [
+    {
+      "subject": "harness audit",
+      "predicate": "has-stale-paths-in",
+      "object": "AGENTS.md"
+    },
+    {
+      "subject": "Termux environment",
+      "predicate": "description-not-correctable-by",
+      "object": "description override gap"
+    },
+    {
+      "subject": "AGENTS.md",
+      "predicate": "description-not-correctable-by",
+      "object": "description override gap"
+    }
+  ]
+}

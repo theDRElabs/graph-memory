@@ -17,7 +17,7 @@
     {
       "name": "harness roadmap",
       "type": "ARTIFACT",
-      "description": "HARNESS-ROADMAP.md - control document listing 24 numbered phases with a pending/in_progress/blocked/completed legend, per-phase goal, work, and completion gate"
+      "description": "HARNESS-ROADMAP.md - control document listing 24 numbered phases with a pending/in_progress/blocked/completed legend; most phases carry a goal, work, and completion gate body (phase 19 has no body section at all, phase 13 has no Work subsection). As of 2026-10-07: phases 0-2 completed, 3 in_progress, 4-23 pending"
     }
   ],
   "relations": [

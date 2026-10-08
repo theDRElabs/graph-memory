@@ -7,12 +7,12 @@
     {
       "name": "harness contract",
       "type": "ARTIFACT",
-      "description": "HARNESS-CONTRACT.md - short always-loaded rules: intent-to-acceptance lifecycle, human/agent/repository responsibility split, six artifact handoffs, verification separation, HITL vs AFK, documentation lifecycle"
+      "description": "HARNESS-CONTRACT.md - short contract read on demand from AGENTS.md (it is NOT auto-injected into context): intent-to-acceptance lifecycle, human/agent/repository responsibility split, six artifact handoffs, verification separation, HITL vs AFK, documentation lifecycle"
     },
     {
       "name": "verification separation",
       "type": "CONCEPT",
-      "description": "Rule that the producer of a substantial change must never be its only verifier; each harness phase ships an independent verifier findings record alongside its fixtures"
+      "description": "Rule that the producer of a substantial change must never be its only verifier. Shipped unevenly so far: phases 1 and 2 each have a VERIFIER-FINDINGS.md; phases 0 and 3 have none"
     }
   ],
   "relations": [

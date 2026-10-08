@@ -12,7 +12,7 @@
     {
       "name": "host migration to Codespace",
       "type": "EVENT",
-      "description": "Device moved off the phone/Termux setup and the EC2/WSL2 box to a Codespace; AGENTS.md states phone-era build lessons and EC2 sideload/proot procedures no longer apply"
+      "description": "Device host changed to a GitHub Codespace, displacing an earlier AWS EC2/WSL2 box and, before that, the phone/Termux setup (HARNESS-AUDIT.md:37-41 documents the EC2 interlude via leftover /home/ubuntu paths). Exact move date not established by any source; bounded only to before 2026-10-07"
     }
   ],
   "relations": [

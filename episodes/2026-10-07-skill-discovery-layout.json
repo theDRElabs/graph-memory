@@ -7,7 +7,7 @@
     {
       "name": "global opencode config dir",
       "type": "LOCATION",
-      "description": "~/.config/opencode - holds opencode.jsonc (MCP servers incl. graph-memory), symlinks to AGENTS.md/HARNESS-*.md, and skills/ + commands/ pointing into harness repos"
+      "description": "~/.config/opencode - holds opencode.jsonc (MCP servers incl. graph-memory); symlinks to AGENTS.md and three harness docs (HARNESS-AUDIT.md, HARNESS-CONTRACT.md, HARNESS-ROADMAP.md - not the HARNESS-METRICS.md or HARNESS-PHASE-*-VALIDATION.md files); and skills/ + commands/ symlinks. grill-me and write-prd resolve into the harness repo, graph-memory resolves into opencode-config"
     },
     {
       "name": "OpenCode skill discovery",

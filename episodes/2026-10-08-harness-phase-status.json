@@ -1,0 +1,35 @@
+{
+  "id": "2026-10-08-harness-phase-status",
+  "source": "/workspaces/Opencode/HARNESS-ROADMAP.md phase tracker, read 2026-10-08; AGENTS.md phase-status line corrected the same day",
+  "date": "2026-10-08",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "harness phase status",
+      "type": "CONCEPT",
+      "description": "Harness build position as of 2026-10-08: phases 0 (audit), 1 (contract), 2 (grill-me) completed; phase 3 (write-prd) in_progress with its gate unmet; phases 4-23 pending. Recorded here because nothing in the graph previously answered 'where is the harness build'"
+    },
+    {
+      "name": "harness roadmap",
+      "type": "ARTIFACT",
+      "description": "HARNESS-ROADMAP.md - control document listing 24 numbered phases with a pending/in_progress/blocked/completed legend; most phases carry a goal, work, and completion gate body (phase 19 has no body section at all, phase 13 has no Work subsection)"
+    },
+    {
+      "name": "AGENTS.md",
+      "type": "ARTIFACT",
+      "description": "Global rules loaded every session: host context, user-mandated communication rules, build pipeline, harness fixture intake, graph-memory workflow, harness contract/roadmap governance. Lives at /workspaces/Opencode/AGENTS.md, symlinked into ~/.config/opencode/"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "harness phase status",
+      "predicate": "reported-in",
+      "object": "harness roadmap"
+    },
+    {
+      "subject": "harness phase status",
+      "predicate": "summarized-in",
+      "object": "AGENTS.md"
+    }
+  ]
+}
