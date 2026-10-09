@@ -1,0 +1,64 @@
+{
+  "id": "2026-10-08-opencode-plugin-format",
+  "source": "Server log /home/codespace/.local/share/opencode/log/opencode.log (ref err_c80ad634, err_95f43c8c) plus direct inspection of /home/codespace/.config/opencode/plugins/auto-capture.js, 2026-10-08",
+  "date": "2026-10-08",
+  "schema_version": "1",
+  "entities": [
+    {
+      "name": "auto-capture plugin",
+      "type": "ARTIFACT",
+      "description": "Plugin at ~/.config/opencode/plugins/auto-capture.js, the only file in the scanned plugin directory. Default-exports {id, setup} and registers chat.message and event hooks that turn user messages into knowledge-graph candidate drafts"
+    },
+    {
+      "name": "OpenCode v2 plugin API",
+      "type": "CONCEPT",
+      "description": "A plugin module must default-export an object carrying an id plus an effect or setup function. Default-exporting a bare async function fails schema validation with SchemaError: Expected object at [default], surfaced as a server-side 'failed to load plugin' warning and a silent no-op - no hooks are registered and the plugin never runs"
+    },
+    {
+      "name": "OpenCode plugin directory",
+      "type": "LOCATION",
+      "description": "~/.config/opencode/plugins/ - the only directory scanned for plugins at server start. Plugins elsewhere, such as /workspaces/opencode-config/plugin/, are never loaded"
+    },
+    {
+      "name": "auto-capture plugin format failure",
+      "type": "EVENT",
+      "description": "2026-10-08 11:19-11:20, server refused to load auto-capture.js (ref err_c80ad634) because it default-exported a bare async function. Fixed at 11:26 by a two-step migration to { id: 'auto-capture', setup: async ({directory}) => hooks }. A watcher reload at 11:26:26 caught the file mid-write and failed with a different error (ref err_95f43c8c, AggregateError building the module) - that was a truncated-write artifact, not a second defect. Verified fixed: 'loading plugin' entries with no following failure at 13:45, 14:10 and 2026-10-09 00:22"
+    },
+    {
+      "name": "graph-memory repo",
+      "type": "REPO"
+    }
+  ],
+  "relations": [
+    {
+      "subject": "auto-capture plugin",
+      "predicate": "located-in",
+      "object": "OpenCode plugin directory"
+    },
+    {
+      "subject": "auto-capture plugin",
+      "predicate": "must-export",
+      "object": "OpenCode v2 plugin API"
+    },
+    {
+      "subject": "auto-capture plugin",
+      "predicate": "writes-candidates-to",
+      "object": "graph-memory repo"
+    },
+    {
+      "subject": "OpenCode plugin directory",
+      "predicate": "is-only-scanned-location-for",
+      "object": "OpenCode v2 plugin API"
+    },
+    {
+      "subject": "auto-capture plugin format failure",
+      "predicate": "was-caused-by-violating",
+      "object": "OpenCode v2 plugin API"
+    },
+    {
+      "subject": "auto-capture plugin format failure",
+      "predicate": "was-fixed-by-migrating",
+      "object": "auto-capture plugin"
+    }
+  ]
+}
